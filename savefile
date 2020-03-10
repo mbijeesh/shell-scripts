@@ -1,0 +1,33 @@
+#!/bin/bash
+LOG=/etc/changelog
+
+date=`date +%Y-%m-%d`
+path=`dirname $1`
+[ $path = '.' ] && path=`pwd`
+base=`basename $1`
+
+if [ ! -e $1 ]
+then
+    echo $0: file not found: $1 >&2
+    exit 1
+fi
+
+if [ ! -f $1 ]
+then
+    echo $0: regular files only please >&2
+    exit 1
+fi
+
+# Savefile from today already exists - append time value
+if [ -f ${1}.${date} ]
+then
+        date=`date +%Y-%m-%d-%T`
+fi
+
+echo $1 \-\> ${1}.${date}
+cp -p $1 ${1}.${date}
+
+if [ $? -eq 0 ]
+then
+    [ -w $LOG ] && echo "$date ${path}/${base}" >> $LOG
+fi
